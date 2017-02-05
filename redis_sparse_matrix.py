@@ -1,9 +1,11 @@
+from itertools import izip
+
 import numpy as np
 from scipy.sparse.base import isspmatrix
 from scipy.sparse.sputils import isintlike, IndexMixin
 
 
-class redis_sparse_matrix(object, IndexMixin):
+class redis_sparse_matrix(IndexMixin):
     """
     Each matrix is a redis hash, with rows as keys.
     Each row is a redis hash, with columns as keys.
@@ -18,8 +20,8 @@ class redis_sparse_matrix(object, IndexMixin):
         self.redis = redis
         self.key = 'rsm:{}'.format(key)
         if init_arr is not None:
-            if not isinstance(init_arr, np.array):
-                raise TypeError('init_arr may only be a numpy array')
+            if not isspmatrix(init_arr):
+                raise TypeError('init_arr may only be a scipy sparse matrix')
 
             self.shape = init_arr.shape
             self._init_using_arr(shape, init_arr)
@@ -62,13 +64,13 @@ class redis_sparse_matrix(object, IndexMixin):
     def _init_using_arr(self, shape, A):
         # first build a dictionary representation of the array
         # then write it using hmset
-        rows, cols = A.nonzero
+        rows, cols = A.nonzero()
         dok = {}
-        for i, j in rows, cols:
+        for i, j in izip(rows, cols):
             key = self._index_accessor(i, j)
             dok[key] = A[i, j]
 
-        return redis.hmset(self.key, dok)
+        return self.redis.hmset(self.key, dok)
 
 
     def _set_element(self, i, j, x):
