@@ -21,7 +21,7 @@ class redis_sparse_matrix(IndexMixin):
 
     def __getitem__(self, index):
         """
-        if key=(i,j), return the corresponding element.
+        if index=(i,j), return the corresponding element.
         if either i or j is absent, return sparse matrix with just these
         """
 
