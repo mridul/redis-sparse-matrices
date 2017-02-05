@@ -6,16 +6,6 @@ from scipy.sparse.sputils import isintlike, IndexMixin
 
 
 class redis_sparse_matrix(IndexMixin):
-    """
-    Each matrix is a redis hash, with rows as keys.
-    Each row is a redis hash, with columns as keys.
-    An equivalent dictionary representation would be:
-    rsm:key: {
-        shape: (rows, cols)
-        0,1: 4.5, 0,2: 0,4:1.1, 0,10: 4.
-    }
-    """
-
     def __init__(self, redis, key, shape=None, init_arr=None):
         self.redis = redis
         self.key = 'rsm:{}'.format(key)
