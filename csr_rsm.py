@@ -28,6 +28,11 @@ class redis_csr_matrix(redis_spmatrix):
             self.shape = shape
             self.dtype = dtype
 
+    def _get_col(self, index):
+        raise NotImplementedError
+
+    def _get_element(self, i, j):
+        raise NotImplementedError
 
     def _get_row(self, i):
         # column indices for row i are in indices[indptr[i]:indptr[i+1]]
@@ -45,9 +50,6 @@ class redis_csr_matrix(redis_spmatrix):
         m = csr_matrix((data, indices, indptr), shape=(1, self.shape[1]))
 
         return m
-
-    def _get_element(self, i, j):
-        raise NotImplementedError
 
     def _index_accessor(self, i, j):
         return '({},{})'.format(i, j)
