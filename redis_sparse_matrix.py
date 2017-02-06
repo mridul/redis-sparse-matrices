@@ -42,6 +42,13 @@ class redis_sparse_matrix(IndexMixin):
         return self._set_element(i, j, x)
 
 
+    def _get_row(self, i):
+        all_keys = self.redis.hkeys(self.key)
+        rk = self._get_row_accessor(i)
+        row_keys = [k for k in all_keys if rk in k]
+        return self.redis.hmget(self.key, row_keys)
+
+
     def _get_element(self, i, j):
         index_accessor = self._index_accessor(i, j)
         return self.redis.hget(self.key, index_accessor)
@@ -49,6 +56,10 @@ class redis_sparse_matrix(IndexMixin):
 
     def _index_accessor(self, i, j):
         return '({},{})'.format(i, j)
+
+
+    def _get_row_accessor(self, i):
+        return '({}'.format(i)
 
 
     def _init_using_arr(self, shape, A):
