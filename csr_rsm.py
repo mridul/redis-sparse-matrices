@@ -47,8 +47,7 @@ class redis_csr_matrix(redis_spmatrix):
         return m
 
     def _get_element(self, i, j):
-        index_accessor = self._index_accessor(i, j)
-        return self.redis.hget(self.key, index_accessor)
+        raise NotImplementedError
 
     def _index_accessor(self, i, j):
         return '({},{})'.format(i, j)
@@ -68,6 +67,11 @@ class redis_csr_matrix(redis_spmatrix):
         self.redis.rpush(self.indptr_key, *indptr)
         self.redis.rpush(self.indices_key, *indices)
 
+    def _set_col(self, index, item):
+        raise NotImplementedError
+
     def _set_element(self, i, j, x):
-        index_accessor = self._index_accessor(i, j)
-        return self.redis.hset(self.key, index_accessor, x)
+        raise NotImplementedError
+
+    def _set_row(self, index, item):
+        raise NotImplementedError
