@@ -27,6 +27,10 @@ class redis_spmatrix(IndexMixin):
                 'col': lambda j: self._set_col(j, item)
             },
         }
+
+        if operation_type not in operation_map:
+            raise ValueError('invalid operation')
+
         operation = operation_map[operation_type]
 
         row, col = self._unpack_index(index)
