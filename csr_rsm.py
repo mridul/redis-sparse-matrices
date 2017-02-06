@@ -1,15 +1,15 @@
-from itertools import izip
-
 import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.base import isspmatrix
-from scipy.sparse.sputils import isintlike, IndexMixin
+
+from .rsm_base import redis_spmatrix
 
 
-class redis_sparse_matrix(IndexMixin):
+class redis_csr_matrix(redis_spmatrix):
     def __init__(
             self, redis, key, shape=None,
-            init_arr=None, dtype='float64'):
+            init_arr=None, dtype='float64'
+    ):
         self.redis = redis
         self.key = 'rsm:{}'.format(key)
         self.data_key = '{}:data'.format(self.key)
@@ -26,29 +26,11 @@ class redis_sparse_matrix(IndexMixin):
             self.shape = shape
             self.dtype = dtype
 
+    def _get_col(self, index):
+        raise NotImplementedError
 
-    def __getitem__(self, index):
-        """
-        if index=(i,j), return the corresponding element.
-        if either i or j is absent, return sparse matrix with just these
-        """
-
-        # TODO slicing if needed
-
-        i, j = self._unpack_index(index)
-        i_intlike, j_intlike = isintlike(i), isintlike(j)
-
-        if i_intlike and j_intlike:
-            if i < 0 or j < 0:
-                raise IndexError('index out of range')
-
-            return self._get_element(i, j)
-
-
-    def __setitem__(self, index, x):
-        i, j = self._unpack_index(index)
-        return self._set_element(i, j, x)
-
+    def _get_element(self, i, j):
+        raise NotImplementedError
 
     def _get_row(self, i):
         # column indices for row i are in indices[indptr[i]:indptr[i+1]]
@@ -67,39 +49,29 @@ class redis_sparse_matrix(IndexMixin):
 
         return m
 
-    def _get_element(self, i, j):
-        index_accessor = self._index_accessor(i, j)
-        return self.redis.hget(self.key, index_accessor)
-
-
-    def _index_accessor(self, i, j):
-        return '({},{})'.format(i, j)
-
-
     def _get_row_accessor(self, i):
         return '({}'.format(i)
 
+    def _index_accessor(self, i, j):
+        return '({},{})'.format(i, j)
 
     def _init_using_arr(self, shape, A):
         data = A.data.tolist()
         indptr = A.indptr.tolist()
         indices = A.indices.tolist()
 
+        # overwrite existing keys
+        self.redis.delete(self.data_key, self.indptr_key, self.indices_key)
+
         self.redis.rpush(self.data_key, *data)
         self.redis.rpush(self.indptr_key, *indptr)
         self.redis.rpush(self.indices_key, *indices)
 
-        # # first build a dictionary representation of the array
-        # # then write it using hmset
-        # rows, cols = A.nonzero()
-        # dok = {}
-        # for i, j in izip(rows, cols):
-        #     key = self._index_accessor(i, j)
-        #     dok[key] = A[i, j]
-
-        # return self.redis.hmset(self.key, dok)
-
+    def _set_col(self, index, item):
+        raise NotImplementedError
 
     def _set_element(self, i, j, x):
-        index_accessor = self._index_accessor(i, j)
-        return self.redis.hset(self.key, index_accessor, x)
+        raise NotImplementedError
+
+    def _set_row(self, index, item):
+        raise NotImplementedError
