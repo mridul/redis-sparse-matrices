@@ -62,7 +62,7 @@ class redis_csr_matrix(redis_spmatrix):
         indices = A.indices.tolist()
 
         # overwrite existing keys
-        self.redis.del(self.data_key, self.indptr_key, self.indices_key)
+        self.redis.delete(self.data_key, self.indptr_key, self.indices_key)
 
         self.redis.rpush(self.data_key, *data)
         self.redis.rpush(self.indptr_key, *indptr)
