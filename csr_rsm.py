@@ -49,11 +49,11 @@ class redis_csr_matrix(redis_spmatrix):
 
         return m
 
-    def _index_accessor(self, i, j):
-        return '({},{})'.format(i, j)
-
     def _get_row_accessor(self, i):
         return '({}'.format(i)
+
+    def _index_accessor(self, i, j):
+        return '({},{})'.format(i, j)
 
     def _init_using_arr(self, shape, A):
         data = A.data.tolist()
