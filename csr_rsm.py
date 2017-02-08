@@ -32,6 +32,18 @@ class redis_csr_matrix(redis_spmatrix):
     def _get_element(self, i, j):
         return self._get_row(i)[0, j]
 
+    def _get_matrix(self):
+        indptr = self.redis.lrange(self.indptr_key, 0, -1)
+        indices = self.redis.lrange(self.indices_key, 0, -1)
+        data = self.redis.lrange(self.data_key, 0, -1)
+
+        m = csr_matrix(
+            (data, indices, indptr),
+            shape=self.shape,
+            dtype=self.dtype
+        )
+        return m
+
     def _get_row(self, i):
         # column indices for row i are in indices[indptr[i]:indptr[i+1]]
         # data for row i is in data[indptr[i]:indptr[i+1]]
