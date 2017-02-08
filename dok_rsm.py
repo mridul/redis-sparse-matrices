@@ -39,14 +39,11 @@ class redis_sparse_matrix(redis_spmatrix):
         row_keys = [k for k in all_keys if rk in k]
         return self.redis.hmget(self.key, row_keys)
 
-
     def _index_accessor(self, i, j):
         return '({},{})'.format(i, j)
 
-
     def _get_row_accessor(self, i):
         return '({}'.format(i)
-
 
     def _init_using_arr(self, shape, A):
         # first build a dictionary representation of the array
