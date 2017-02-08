@@ -1,8 +1,6 @@
 from itertools import izip
 
-import numpy as np
 from scipy.sparse.base import isspmatrix
-from scipy.sparse.sputils import isintlike, IndexMixin
 
 from rsm_base import redis_spmatrix
 
