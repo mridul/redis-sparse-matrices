@@ -71,7 +71,7 @@ class redis_spmatrix(IndexMixin):
         raise NotImplementedError
 
     def __getitem__(self, index):
-        self._get_or_set_item('get', index)
+        return self._get_or_set_item('get', index)
 
     def __setitem__(self, index, item):
         self._get_or_set_item('set', index, item)
