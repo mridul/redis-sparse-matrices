@@ -86,4 +86,7 @@ class redis_csr_matrix(redis_spmatrix):
         raise NotImplementedError
 
     def _set_row(self, index, item):
-        raise NotImplementedError
+        m = self._get_matrix()
+        m[index] = item
+        self._init_using_arr(m.shape, m)
+        return
