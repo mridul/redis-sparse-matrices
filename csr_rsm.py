@@ -2,7 +2,7 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.base import isspmatrix
 
-from .rsm_base import redis_spmatrix
+from rsm_base import redis_spmatrix
 
 
 class redis_csr_matrix(redis_spmatrix):
