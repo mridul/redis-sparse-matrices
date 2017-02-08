@@ -61,6 +61,12 @@ class redis_sparse_matrix(redis_spmatrix):
 
         return self.redis.hmset(self.key, dok)
 
+    def _set_col(self, index, item):
+        raise NotImplementedError
+
     def _set_element(self, i, j, x):
         index_accessor = self._index_accessor(i, j)
         return self.redis.hset(self.key, index_accessor, x)
+
+    def _set_row(self, index, item):
+        raise NotImplementedError
