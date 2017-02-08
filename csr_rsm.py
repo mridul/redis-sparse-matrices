@@ -30,7 +30,7 @@ class redis_csr_matrix(redis_spmatrix):
         raise NotImplementedError
 
     def _get_element(self, i, j):
-        raise NotImplementedError
+        return self._get_row(i)[0, j]
 
     def _get_row(self, i):
         # column indices for row i are in indices[indptr[i]:indptr[i+1]]
